@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Touch Swipe Service</string>
+    <string name="accessibility_service_description">Detecta cuándo se abre la app configurada para ejecutar un gesto automático definido por el usuario.</string>
+</resources>

@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Encabezado -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Touch Swipe Service"
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Automatiza un gesto al abrir tu app"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Card: estado Shizuku -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardShizuku"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:id="@+id/dotShizuku"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/dot_status"
+                        android:layout_marginEnd="10dp" />
+
+                    <TextView
+                        android:id="@+id/tvShizukuStatus"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Shizuku: comprobando..."
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRequestShizukuPermission"
+                    style="@style/RoundedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:backgroundTint="@color/primary"
+                    android:text="Solicitar permiso de Shizuku" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOpenAccessibilitySettings"
+                    style="@style/OutlinedRoundedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Abrir ajustes de Accesibilidad" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Card: configuración del gesto -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚙️ Configuración del gesto"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/etPackage"
+                    style="@style/RoundedEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Package objetivo (ej: com.example.miapp)" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp">
+
+                    <EditText
+                        android:id="@+id/etX1"
+                        style="@style/RoundedEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:inputType="number"
+                        android:hint="X inicial" />
+
+                    <EditText
+                        android:id="@+id/etY1"
+                        style="@style/RoundedEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:inputType="number"
+                        android:hint="Y inicial" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
+
+                    <EditText
+                        android:id="@+id/etX2"
+                        style="@style/RoundedEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:inputType="number"
+                        android:hint="X final" />
+
+                    <EditText
+                        android:id="@+id/etY2"
+                        style="@style/RoundedEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:inputType="number"
+                        android:hint="Y final" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/etDuration"
+                    style="@style/RoundedEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:inputType="number"
+                    android:hint="Duración del swipe (ms)" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSaveConfig"
+                    style="@style/RoundedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/accent"
+                    android:textColor="@color/bg_start"
+                    android:text="Guardar configuración" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnActivar"
+                    style="@style/RoundedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:backgroundTint="@color/primary"
+                    android:text="🟢 Activar" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Card: control del servicio -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardService"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🔄 Servicio activo"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+
+                    <Switch
+                        android:id="@+id/switchEnabled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:thumbTint="@color/accent"
+                        android:trackTint="@color/primary_dark" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTestSwipe"
+                    style="@style/RoundedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/primary"
+                    android:text="▶ Probar gesto ahora" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>
