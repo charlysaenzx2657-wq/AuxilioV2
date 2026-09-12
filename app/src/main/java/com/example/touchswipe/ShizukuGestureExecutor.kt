@@ -42,6 +42,11 @@ object ShizukuGestureExecutor {
      * Lanza el swipe. Devuelve true si el proceso se pudo iniciar
      * (no garantiza que el gesto haya sido "aceptado" por la UI destino,
      * solo que el comando shell se ejecutó).
+     *
+     * NOTA: Shizuku.newProcess es un método interno (no público) de la
+     * librería dev.rikka.shizuku:api, así que se invoca por reflexión,
+     * que es la forma estándar en la que lo hacen la mayoría de apps
+     * basadas en Shizuku.
      */
     fun performSwipe(x1: Int, y1: Int, x2: Int, y2: Int, durationMs: Int): Boolean {
         if (!isShizukuAvailable() || !hasPermission()) {
@@ -57,14 +62,50 @@ object ShizukuGestureExecutor {
                 durationMs.toString()
             )
 
-            val process = Shizuku.newProcess(command, null, null)
+            val process = newProcessViaReflection(command, null, null)
             process.waitFor()
-            val exitCode = process.exitValue()
+            val exitCode = process.exitValue() as Int
             Log.d(TAG, "Swipe ejecutado, exit code=$exitCode")
             exitCode == 0
         } catch (e: Throwable) {
             Log.e(TAG, "Error ejecutando swipe vía Shizuku", e)
             false
+        }
+    }
+
+    /**
+     * Invoca el método privado Shizuku.newProcess(String[], String[], String)
+     * por reflexión, ya que no está expuesto públicamente en la API.
+     * Devuelve un objeto rikka.shizuku.ShizukuRemoteProcess sobre el que
+     * llamamos waitFor()/exitValue() también por reflexión.
+     */
+    private fun newProcessViaReflection(cmd: Array<String>, env: Array<String>?, dir: String?): ReflectedProcess {
+        val method = Shizuku::class.java.getDeclaredMethod(
+            "newProcess",
+            Array<String>::class.java,
+            Array<String>::class.java,
+            String::class.java
+        )
+        method.isAccessible = true
+        val processObj = method.invoke(null, cmd, env, dir)
+            ?: throw IllegalStateException("Shizuku.newProcess devolvió null")
+        return ReflectedProcess(processObj)
+    }
+
+    /**
+     * Wrapper mínimo para llamar waitFor()/exitValue() sobre el objeto
+     * ShizukuRemoteProcess obtenido por reflexión, sin depender de su tipo
+     * concreto en tiempo de compilación.
+     */
+    private class ReflectedProcess(private val target: Any) {
+        fun waitFor(): Int {
+            val method = target.javaClass.getMethod("waitFor")
+            return method.invoke(target) as Int
+        }
+
+        fun exitValue(): Any {
+            val method = target.javaClass.getMethod("exitValue")
+            return method.invoke(target)
         }
     }
 }
