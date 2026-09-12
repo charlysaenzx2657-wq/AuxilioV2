@@ -24,11 +24,30 @@ jobs:
       - name: Dar permisos de ejecución a gradlew
         run: chmod +x gradlew
 
-      - name: Compilar APK debug
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Decodificar keystore desde el secret
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > touchswipe-release.jks
 
-      - name: Subir APK como artefacto
+      - name: Compilar APK release firmado
+        env:
+          RELEASE_STORE_FILE: touchswipe-release.jks
+          RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease \
+            -PRELEASE_STORE_FILE=$RELEASE_STORE_FILE \
+            -PRELEASE_STORE_PASSWORD=$RELEASE_STORE_PASSWORD \
+            -PRELEASE_KEY_ALIAS=$RELEASE_KEY_ALIAS \
+            -PRELEASE_KEY_PASSWORD=$RELEASE_KEY_PASSWORD \
+            --stacktrace
+
+      - name: Subir APK firmado como artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: touch-swipe-service-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: touch-swipe-service-release
+          path: app/build/outputs/apk/release/app-release.apk
+
+      - name: Limpiar keystore del runner
+        if: always()
+        run: rm -f touchswipe-release.jks
