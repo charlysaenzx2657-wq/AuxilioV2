@@ -26,7 +26,7 @@ jobs:
 
       - name: Decodificar keystore desde el secret
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > touchswipe-release.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/touchswipe-release.jks
 
       - name: Compilar APK release firmado
         env:
@@ -50,4 +50,4 @@ jobs:
 
       - name: Limpiar keystore del runner
         if: always()
-        run: rm -f touchswipe-release.jks
+        run: rm -f app/touchswipe-release.jks
