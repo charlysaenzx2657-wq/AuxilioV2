@@ -45,11 +45,11 @@ object SwipeConfig {
     fun targetPackage(context: Context): String =
         prefs(context).getString(KEY_PACKAGE, "") ?: ""
 
-    fun x1(context: Context) = prefs(context).getInt(KEY_X1, 0)
-    fun y1(context: Context) = prefs(context).getInt(KEY_Y1, 0)
-    fun x2(context: Context) = prefs(context).getInt(KEY_X2, 0)
-    fun y2(context: Context) = prefs(context).getInt(KEY_Y2, 0)
-    fun durationMs(context: Context) = prefs(context).getInt(KEY_DURATION, 300)
+    fun x1(context: Context) = prefs(context).getInt(KEY_X1, 1250)
+    fun y1(context: Context) = prefs(context).getInt(KEY_Y1, 646)
+    fun x2(context: Context) = prefs(context).getInt(KEY_X2, 1183)
+    fun y2(context: Context) = prefs(context).getInt(KEY_Y2, 484)
+    fun durationMs(context: Context) = prefs(context).getInt(KEY_DURATION, 1600)
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

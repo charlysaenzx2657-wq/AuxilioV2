@@ -1,9 +1,14 @@
 package com.example.touchswipe
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
@@ -33,6 +38,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var etDuration: EditText
     private lateinit var switchEnabled: Switch
     private lateinit var btnTestSwipe: Button
+    private lateinit var btnShizukuAction: Button
+
+    private val statusHandler = Handler(Looper.getMainLooper())
+    private val statusRefreshRunnable = object : Runnable {
+        override fun run() {
+            updateShizukuStatus()
+            statusHandler.postDelayed(this, 3000L)
+        }
+    }
 
     private val permissionListener = Shizuku.OnRequestPermissionResultListener { _, grantResult ->
         updateShizukuStatus()
@@ -58,12 +72,13 @@ class MainActivity : AppCompatActivity() {
         etDuration = findViewById(R.id.etDuration)
         switchEnabled = findViewById(R.id.switchEnabled)
         btnTestSwipe = findViewById(R.id.btnTestSwipe)
+        btnShizukuAction = findViewById(R.id.btnShizukuAction)
 
         loadConfigIntoUi()
         animateCardsEntrance()
 
-        findViewById<Button>(R.id.btnRequestShizukuPermission).setOnClickListener {
-            requestShizukuPermission()
+        btnShizukuAction.setOnClickListener {
+            handleShizukuAction()
         }
 
         findViewById<Button>(R.id.btnOpenAccessibilitySettings).setOnClickListener {
@@ -92,7 +107,18 @@ class MainActivity : AppCompatActivity() {
             // Shizuku no instalado / no corriendo
         }
 
+        applyPressAnimationToAllButtons()
         updateShizukuStatus()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        statusHandler.post(statusRefreshRunnable)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        statusHandler.removeCallbacks(statusRefreshRunnable)
     }
 
     override fun onResume() {
@@ -139,16 +165,99 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Configuración guardada", Toast.LENGTH_SHORT).show()
     }
 
-    private fun requestShizukuPermission() {
-        if (!ShizukuGestureExecutor.isShizukuAvailable()) {
-            Toast.makeText(this, "Shizuku no está corriendo", Toast.LENGTH_SHORT).show()
-            return
+    /**
+     * Botón único e inteligente para Shizuku: decide automáticamente
+     * qué acción corresponde según el estado actual, en vez de obligar
+     * al usuario a saber si debe "abrir Shizuku", "pedir permiso" o
+     * "instalar la app".
+     */
+    private fun handleShizukuAction() {
+        when {
+            !isShizukuAppInstalled() -> {
+                Toast.makeText(this, "Instalando/abriendo Shizuku...", Toast.LENGTH_SHORT).show()
+                openShizukuOnPlayStore()
+            }
+            !ShizukuGestureExecutor.isShizukuAvailable() -> {
+                Toast.makeText(
+                    this,
+                    "Abre la app Shizuku y arranca el servicio (pairing/ADB), luego vuelve aquí",
+                    Toast.LENGTH_LONG
+                ).show()
+                openShizukuApp()
+            }
+            ShizukuGestureExecutor.hasPermission() -> {
+                Toast.makeText(this, "✅ Shizuku ya está listo", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                ShizukuGestureExecutor.requestPermission(REQUEST_CODE_SHIZUKU)
+            }
         }
-        if (ShizukuGestureExecutor.hasPermission()) {
-            Toast.makeText(this, "Ya tienes permiso", Toast.LENGTH_SHORT).show()
-            return
+    }
+
+    private fun isShizukuAppInstalled(): Boolean {
+        return try {
+            packageManager.getPackageInfo("moe.shizuku.privileged.api", 0)
+            true
+        } catch (e: Exception) {
+            false
         }
-        ShizukuGestureExecutor.requestPermission(REQUEST_CODE_SHIZUKU)
+    }
+
+    private fun openShizukuApp() {
+        try {
+            val intent = packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")
+            if (intent != null) startActivity(intent) else openShizukuOnPlayStore()
+        } catch (e: Exception) {
+            openShizukuOnPlayStore()
+        }
+    }
+
+    private fun openShizukuOnPlayStore() {
+        try {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=moe.shizuku.privileged.api")
+                )
+            )
+        } catch (e: Exception) {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api")
+                )
+            )
+        }
+    }
+
+    /**
+     * Aplica una pequeña animación de escala (presiona/suelta) a todos
+     * los MaterialButton de la pantalla, para que la interfaz se sienta
+     * más táctil e interactiva.
+     */
+    private fun applyPressAnimationToAllButtons() {
+        val buttons = listOf<View>(
+            btnShizukuAction,
+            findViewById(R.id.btnOpenAccessibilitySettings),
+            findViewById(R.id.btnSaveConfig),
+            findViewById(R.id.btnActivar),
+            btnTestSwipe
+        )
+        buttons.forEach { button ->
+            button.setOnTouchListener { v, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        ObjectAnimator.ofFloat(v, "scaleX", 0.96f).setDuration(100).start()
+                        ObjectAnimator.ofFloat(v, "scaleY", 0.96f).setDuration(100).start()
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        ObjectAnimator.ofFloat(v, "scaleX", 1f).setDuration(100).start()
+                        ObjectAnimator.ofFloat(v, "scaleY", 1f).setDuration(100).start()
+                    }
+                }
+                false // dejamos que el click normal siga funcionando
+            }
+        }
     }
 
     /**
@@ -238,6 +347,13 @@ class MainActivity : AppCompatActivity() {
             !available -> "Shizuku: no disponible (¿está corriendo?)"
             !granted -> "Shizuku: disponible, permiso NO concedido"
             else -> "Shizuku: disponible y permiso concedido"
+        }
+
+        btnShizukuAction.text = when {
+            !isShizukuAppInstalled() -> "📥 Instalar Shizuku"
+            !available -> "▶ Abrir Shizuku"
+            !granted -> "🔓 Dar permiso"
+            else -> "✅ Shizuku listo"
         }
 
         updateStatusDot(

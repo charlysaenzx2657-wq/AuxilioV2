@@ -71,21 +71,13 @@
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRequestShizukuPermission"
+                    android:id="@+id/btnShizukuAction"
                     style="@style/RoundedButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:backgroundTint="@color/primary"
-                    android:text="Solicitar permiso de Shizuku" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOpenAccessibilitySettings"
-                    style="@style/OutlinedRoundedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Abrir ajustes de Accesibilidad" />
+                    android:text="Configurar Shizuku" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -244,6 +236,14 @@
                         android:thumbTint="@color/accent"
                         android:trackTint="@color/primary_dark" />
                 </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOpenAccessibilitySettings"
+                    style="@style/OutlinedRoundedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="🛠 Activar en Accesibilidad" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTestSwipe"
